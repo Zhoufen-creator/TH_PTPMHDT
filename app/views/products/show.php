@@ -50,7 +50,13 @@
                 </p>
             </div>
 
-            <div class="d-flex gap-3 mt-4 pt-4 border-top border-secondary">
+            <div class="d-flex gap-3 mt-4 pt-4 border-top border-secondary flex-wrap">
+                <form method="POST" action="/Cart/addToCart/<?php echo $product->id; ?>" class="d-flex gap-2">
+                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="max-width: 80px; background-color: #2a2a32; border-color: rgba(255, 42, 117, 0.5); color: #fff;">
+                    <button type="submit" class="btn btn-neon px-4">
+                        <i class="fas fa-shopping-cart me-2"></i>THÊM VÀO GIỎ
+                    </button>
+                </form>
                 <a href="/product/edit/<?php echo $product->id; ?>" class="btn btn-neon px-4">
                     CHỈNH SỬA
                 </a>

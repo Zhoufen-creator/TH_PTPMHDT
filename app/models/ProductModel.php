@@ -63,7 +63,7 @@ class ProductModel
         }
         return false; 
     } 
-    public function updateProduct($id, $name, $description, $price, $category_id) 
+    public function updateProduct($id, $name, $description, $price, $category_id, $image) 
     { 
         $query = "UPDATE " . $this->table_name . " SET name=:name, 
                   description=:description, price=:price, category_id=:category_id, image=:image WHERE id=:id";

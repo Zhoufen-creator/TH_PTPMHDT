@@ -162,5 +162,6 @@ class ProductController
         $products = $this->productModel->getProducts(); 
         require_once 'app/views/product/list.php'; 
     } 
+
 }
 ?>

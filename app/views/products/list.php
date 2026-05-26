@@ -73,7 +73,13 @@
                             $<?php echo number_format(htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'), 2); ?>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-top border-secondary d-flex justify-content-end gap-2 p-3">
+                    <div class="card-footer bg-transparent border-top border-secondary d-flex justify-content-between gap-2 p-3 flex-wrap">
+                        <form method="POST" action="/Cart/addToCart/<?php echo $product->id; ?>" class="d-flex gap-2 flex-grow-1">
+                            <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm" style="max-width: 60px; background-color: #2a2a32; border-color: rgba(255, 42, 117, 0.5); color: #fff;">
+                            <button type="submit" class="btn btn-sm btn-neon flex-grow-1">
+                                <i class="fas fa-shopping-cart me-1"></i>Thêm Giỏ
+                            </button>
+                        </form>
                         <a href="/product/edit/<?php echo $product->id; ?>" class="btn btn-sm btn-outline-light">Sửa</a>
                         <a href="/product/delete/<?php echo $product->id; ?>" 
                            class="btn btn-sm btn-danger"

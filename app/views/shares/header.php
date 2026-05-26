@@ -47,9 +47,25 @@
                     </li> 
                     <li class="nav-item"> 
                         <a class="nav-link" href="/product/add">Thêm sản phẩm</a> 
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Cart/index">
+                            <i class="fas fa-shopping-cart" style="color: #ff2a75;"></i>
+                            Giỏ Hàng
+                            <?php 
+                                require_once 'app/models/CartService.php';
+                                require_once 'app/config/database.php';
+                                $db = (new Database())->getConnection();
+                                $cartService = new CartService($db);
+                                $cartCount = $cartService->getCartCount();
+                                if ($cartCount > 0) {
+                                    echo '<span style="background-color: #ff2a75; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.8rem; margin-left: 5px;">' . $cartCount . '</span>';
+                                }
+                            ?>
+                        </a>
                     </li> 
                 </ul> 
-            </div> 
+            </div>
         </div>
     </nav> 
 
