@@ -53,7 +53,7 @@
                             <i class="fas fa-shopping-cart" style="color: #ff2a75;"></i>
                             Giỏ Hàng
                             <?php 
-                                require_once 'app/models/CartService.php';
+                                require_once 'app/Services/CartService.php';
                                 require_once 'app/config/database.php';
                                 $db = (new Database())->getConnection();
                                 $cartService = new CartService($db);

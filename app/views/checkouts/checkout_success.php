@@ -35,22 +35,22 @@
         
         <div class="detail-row">
             <span class="detail-label">Tên Khách Hàng:</span>
-            <span class="detail-value"><?= htmlspecialchars($order->user_name) ?></span>
+            <span class="detail-value"><?= htmlspecialchars($order->name) ?></span>
         </div>
         
         <div class="detail-row">
             <span class="detail-label">Email:</span>
-            <span class="detail-value"><?= htmlspecialchars($order->user_email) ?></span>
+            <span class="detail-value"><?= htmlspecialchars($order->email) ?></span>
         </div>
         
         <div class="detail-row">
             <span class="detail-label">Số Điện Thoại:</span>
-            <span class="detail-value"><?= htmlspecialchars($order->user_phone) ?></span>
+            <span class="detail-value"><?= htmlspecialchars($order->phone) ?></span>
         </div>
         
         <div class="detail-row">
             <span class="detail-label">Địa Chỉ:</span>
-            <span class="detail-value"><?= htmlspecialchars($order->user_address) ?></span>
+            <span class="detail-value"><?= htmlspecialchars($order->address) ?></span>
         </div>
         
         <div class="detail-row" style="border-bottom: 2px solid rgba(255, 42, 117, 0.3); padding-bottom: 15px; margin-bottom: 15px;">
@@ -60,7 +60,7 @@
         
         <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
             <span class="detail-label">Tổng Tiền:</span>
-            <span class="price-tag"><?= number_format($order->total_price, 0, ',', '.') ?> ₫</span>
+            <span class="price-tag"><?= number_format($order->total_amount, 0, ',', '.') ?> ₫</span>
         </div>
     </div>
 
@@ -77,12 +77,14 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($orderItems as $item): ?>
+                <?php foreach ($orderItems as $item): 
+                    $subtotal = $item->quantity * $item->price;
+                ?>
                     <tr>
-                        <td><?= htmlspecialchars($item->product_name) ?></td>
+                        <td><?= htmlspecialchars($item->product_name ?? 'Sản phẩm') ?></td>
                         <td style="text-align: center;"><?= $item->quantity ?></td>
                         <td><span class="price-tag"><?= number_format($item->price, 0, ',', '.') ?> ₫</span></td>
-                        <td><span class="price-tag"><?= number_format($item->subtotal, 0, ',', '.') ?> ₫</span></td>
+                        <td><span class="price-tag"><?= number_format($subtotal, 0, ',', '.') ?> ₫</span></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -90,7 +92,7 @@
     </div>
 
     <div class="order-details mt-4" style="text-align: center; padding: 20px; background: rgba(46, 204, 113, 0.05); border-color: rgba(46, 204, 113, 0.3);">
-        <p style="color: #ccc; margin: 0 0 15px 0;">Chúng tôi sẽ gửi xác nhận đơn hàng và thông tin vận chuyển đến email <span style="color: #ff2a75; font-weight: bold;"><?= htmlspecialchars($order->user_email) ?></span></p>
+        <p style="color: #ccc; margin: 0 0 15px 0;">Chúng tôi sẽ gửi xác nhận đơn hàng và thông tin vận chuyển đến email <span style="color: #ff2a75; font-weight: bold;"><?= htmlspecialchars($order->email) ?></span></p>
         <p style="color: #888; font-size: 0.95rem; margin: 0;">Vui lòng kiểm tra email của bạn trong vài phút tới. Nếu không nhận được, hãy kiểm tra mục spam.</p>
     </div>
 

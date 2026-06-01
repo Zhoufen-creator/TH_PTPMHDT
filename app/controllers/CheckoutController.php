@@ -3,17 +3,18 @@
 require_once 'app/config/database.php';
 require_once 'app/config/VNPayConfig.php';
 require_once 'app/models/CartService.php';
-require_once 'app/models/VNPayService.php';
-// Đã xóa require OrderModel.php
+require_once 'app/Services/VNPayService.php';
+require_once 'app/models/OrderModel.php';
 
 class CheckoutController {
     private $db;
     private $cartService;
+    private $orderModel;
 
     public function __construct() {
         $this->db = (new Database())->getConnection();
         $this->cartService = new CartService($this->db);
-        // Đã xóa khởi tạo OrderModel
+        $this->orderModel = new OrderModel($this->db);
     }
 
     public function index() {
@@ -41,7 +42,7 @@ class CheckoutController {
             exit;
         }
 
-        // Get form data (Vẫn giữ lại để validate nếu frontend yêu cầu, dù không lưu DB)
+        // Get form data
         $userName = trim($_POST['user_name'] ?? '');
         $userEmail = trim($_POST['user_email'] ?? '');
         $userPhone = trim($_POST['user_phone'] ?? '');
@@ -61,11 +62,31 @@ class CheckoutController {
             exit;
         }
 
-        // Tạo mã giao dịch ảo (vẫn cần để gửi lên VNPay hoặc truyền sang trang Success)
+        // Tạo mã giao dịch
         $orderCode = VNPayService::generateOrderId();
         $totalPrice = $cartDetails['totalPrice'];
 
-        // KHÔNG LƯU VÀO DATABASE NỮA
+        $orderData = [
+            'name' => $userName,
+            'phone' => $userPhone,
+            'address' => $userAddress
+        ];
+
+        $orderId = $this->orderModel->createOrder($orderData);
+        
+        if (!$orderId) {
+            echo json_encode(['success' => false, 'message' => 'Lỗi khi tạo đơn hàng']);
+            exit;
+        }
+
+
+        foreach ($cartDetails['items'] as $item) {
+            $this->orderModel->addOrderItem($orderId, $item['id'], $item['quantity'], $item['price']);
+        }
+
+        // Store order code in session for verification later
+        $_SESSION['pending_order_code'] = $orderCode;
+        $_SESSION['pending_order_id'] = $orderId;
 
         // Handle payment based on method
         if ($paymentMethod === 'vnpay') {
@@ -76,9 +97,6 @@ class CheckoutController {
                 'Thanh toan don hang ' . $orderCode
             );
 
-            // Store order code in session for verification later
-            $_SESSION['pending_order_code'] = $orderCode;
-
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
@@ -87,13 +105,13 @@ class CheckoutController {
                 'order_code' => $orderCode
             ]);
         } else if ($paymentMethod === 'cod') {
-            // NẾU LÀ COD -> Chỉ cần xóa giỏ hàng và báo thành công
+            // COD - Đơn hàng đã được tạo, xóa giỏ hàng
             $this->cartService->clearCart();
 
             header('Content-Type: application/json');
             echo json_encode([
                 'success' => true,
-                'message' => 'Đơn hàng đã được tạo',
+                'message' => 'Đơn hàng đã được tạo thành công',
                 'order_code' => $orderCode,
                 'redirect' => '/Checkout/success/' . $orderCode
             ]);
@@ -136,7 +154,7 @@ class CheckoutController {
 
         $vnp_TxnRef = $vnpay_data['vnp_TxnRef'] ?? '';
 
-        // ĐÃ THANH TOÁN THÀNH CÔNG -> XÓA GIỎ HÀNG
+        // ✅ THANH TOÁN THÀNH CÔNG -> XÓA GIỎ HÀNG
         $this->cartService->clearCart();
 
         // Redirect to success page
@@ -145,11 +163,10 @@ class CheckoutController {
     }
 
     public function success($orderCode) {
-        // Ở hàm này trước đây bạn gọi DB ra lấy dữ liệu Order truyền cho View.
-        // Giờ không có DB, bạn tự xử lý hiển thị ở file checkout_success.php (chỉ hiển thị mã $orderCode)
-       echo "<script>
-            alert('Thanh toán thành công! Mã đơn hàng của bạn là: " . htmlspecialchars($orderCode) . "');
-            window.location.href = '/product/index';
+        // Hiển thị trang thành công với mã đơn hàng
+        echo "<script>
+            alert('Thanh toán thành công! Mã đơn hàng: " . htmlspecialchars($orderCode) . "');
+            window.location.href = '/Product';
         </script>";
         exit;
     }
