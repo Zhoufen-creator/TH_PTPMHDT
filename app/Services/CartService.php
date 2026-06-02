@@ -1,6 +1,6 @@
 <?php
 
-require_once 'app/models/RedisHelper.php';
+require_once 'app/helpers/RedisHelper.php';
 require_once 'app/models/ProductModel.php';
 
 class CartService {
@@ -15,7 +15,7 @@ class CartService {
     }
 
     private function getCartKey() {
-        return $this->cartKeyPrefix . session_id();
+        return $this->cartKeyPrefix . $_SESSION['user_id'];
     }
 
     public function addToCart($productId, $quantity = 1) {

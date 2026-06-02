@@ -1,7 +1,7 @@
 <?php
 
 require_once 'app/config/database.php';
-require_once 'app/models/CartService.php';
+require_once 'app/services/CartService.php';
 require_once 'app/models/ProductModel.php';
 
 class CartController {
@@ -17,7 +17,7 @@ class CartController {
 
     public function index() {
         $cartDetails = $this->cartService->getCartDetails();
-        include 'app/views/cart_index.php';
+        include 'app/views/cart/cart_index.php';
     }
 
     public function addToCart($productId) {

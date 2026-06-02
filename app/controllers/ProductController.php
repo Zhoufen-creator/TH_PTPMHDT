@@ -11,9 +11,21 @@ class ProductController
 
     public function __construct()
     {
+        // if (!SessionHelper::isAdmin()){
+        //     header("Location: /");
+        //     exit();
+        // }
         $this->db = (new Database())->getConnection();
         $this->ProductModel = new ProductModel($this->db);
     }
+
+    private function AuthAdmin()
+    {
+        if (!SessionHelper::isAdmin()){
+            header("Location: /Product");
+            exit();
+        }
+    }   
 
     public function index()
     {
@@ -34,12 +46,14 @@ class ProductController
 
     public function add()
     {
+        $this->AuthAdmin();
         $categories = (new CategoryModel($this->db))->getCategories();
         include_once "app/views/products/add.php";
     }
 
     public function save()
     {
+        $this->AuthAdmin();
         if ($_SERVER["REQUEST_METHOD"] == "POST")
         {
             $name = $_POST["name"] ?? "";
@@ -68,6 +82,7 @@ class ProductController
 
     public function edit($id) 
     { 
+        $this->AuthAdmin();
         $product = $this->ProductModel->getProductById($id); 
         $categories = (new CategoryModel($this->db))->getCategories(); 
         if ($product) { 
@@ -79,6 +94,7 @@ class ProductController
 
     public function update() 
     { 
+        $this->AuthAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') { 
             $id = $_POST['id']; 
             $name = $_POST['name']; 
@@ -105,6 +121,7 @@ class ProductController
 
     public function delete($id) 
     { 
+        $this->AuthAdmin();
         if ($this->ProductModel->deleteProduct($id)) { 
             header('Location: /Product'); 
         } else { 
