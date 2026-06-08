@@ -286,7 +286,7 @@ class AccountController {
     // BƯỚC 6: Login
         $_SESSION['user_id'] = $account['id'];
         $_SESSION['username'] = $account['username'];
-        $_SESSION['fullname'] = $account['fullname'];
+        $_SESSION['fullname'] = $account['fullname'] ?? $account['username'];
         $_SESSION['role'] = $account['role'];
 
         header("Location: /Product/");
@@ -294,6 +294,7 @@ class AccountController {
     }
 
     public function save() { 
+        echo "Da vao save";
         if ($_SERVER['REQUEST_METHOD'] == 'POST') { 
             $username = $_POST['username'] ?? ''; 
             $fullName = $_POST['fullname'] ?? ''; 
@@ -314,6 +315,7 @@ class AccountController {
                 include_once 'app/views/account/register.php'; 
             } else { 
                 $result = $this->accountModel->save($username, $fullName, $password, $role); 
+                echo "Da luu xong";
                 if ($result) { 
                     header('Location: /account/login');
                     exit;
@@ -339,8 +341,9 @@ class AccountController {
             if ($account && password_verify($password, $account->password)) { 
                 session_start(); 
                 if (!isset($_SESSION['username'])) { 
-                $_SESSION['username'] = $account->username; 
-                $_SESSION['role'] = $account->role; 
+                    $_SESSION['username'] = $account->username; 
+                    $_SESSION['role'] = $account->role; 
+                    $_SESSION['fullname'] = $account->fullname ?? $account->username; 
                 }
                 header('Location: /Product'); 
             exit; 

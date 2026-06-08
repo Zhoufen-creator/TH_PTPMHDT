@@ -17,18 +17,10 @@
         <h1 class="tech-title m-0">ADD</h1>
     </div>
 
-    <?php if (!empty($errors)): ?> 
-        <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ffcccc;"> 
-            <ul class="mb-0"> 
-                <?php foreach ($errors as $error): ?> 
-                    <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li> 
-                <?php endforeach; ?> 
-            </ul> 
-        </div> 
-    <?php endif; ?> 
+    <div id="errorContainer"></div>
 
     <div class="tech-card">
-        <form method="POST" action="/Product/save" onsubmit="return validateForm();" enctype="multipart/form-data"> 
+        <form id="addProductForm" enctype="multipart/form-data"> 
             
             <div class="form-group mb-4"> 
                 <label for="name" class="tech-label">Tên sản phẩm:</label> 
@@ -64,11 +56,68 @@
             </div> 
             
             <div class="d-flex justify-content-between align-items-center">
-                <a href="/Product/list" class="btn btn-outline-secondary">Trở về System</a> 
-                <button type="submit" class="btn btn-neon px-5 py-2">XÁC NHẬN LƯU</button> 
+                <a href="/product/" class="btn btn-outline-secondary">Trở về System</a> 
+                <button type="submit" class="btn btn-neon px-5 py-2" id="submitBtn">XÁC NHẬN LƯU</button> 
             </div>
         </form> 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('addProductForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorContainer = document.getElementById('errorContainer');
+            
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang lưu...';
+                errorContainer.innerHTML = '';
+                
+                try {
+                    const formData = new FormData(form);
+                    const data = {
+                        name: formData.get('name'),
+                        description: formData.get('description'),
+                        price: formData.get('price'),
+                        category_id: formData.get('category_id')
+                    };
+                    
+                    const response = await fetch('/api/product', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        // Success
+                        alert('Sản phẩm đã được tạo thành công!');
+                        window.location.href = '/product/';
+                    } else if (result.errors) {
+                        // Show validation errors
+                        const errorHtml = '<div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ffcccc;"><ul class="mb-0">' +
+                            result.errors.map(err => `<li>${err}</li>`).join('') +
+                            '</ul></div>';
+                        errorContainer.innerHTML = errorHtml;
+                    } else {
+                        throw new Error(result.message || 'Lỗi không xác định');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorContainer.innerHTML = `<div class="alert alert-danger">Lỗi: ${error.message}</div>`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'XÁC NHẬN LƯU';
+                }
+            });
+        });
+    </script>
 </div>
 
 <?php include 'app/views/shares/footer.php'; ?>

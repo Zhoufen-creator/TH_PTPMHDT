@@ -50,7 +50,7 @@ class ProductModel
         $description = htmlspecialchars(strip_tags($description)); 
         $price = htmlspecialchars(strip_tags($price)); 
         $category_id = htmlspecialchars(strip_tags($category_id)); 
-        $image = htmlspecialchars(strip_tags($image));
+        $image = $image ? htmlspecialchars(strip_tags($image)) : null;
 
         $stmt->bindParam(':name', $name); 
         $stmt->bindParam(':description', $description); 
@@ -73,7 +73,7 @@ class ProductModel
         $description = htmlspecialchars(strip_tags($description)); 
         $price = htmlspecialchars(strip_tags($price)); 
         $category_id = htmlspecialchars(strip_tags($category_id));
-        $image = htmlspecialchars(strip_tags($image));
+        $image = $image ? htmlspecialchars(strip_tags($image)) : null;
         
         $stmt->bindParam(':id', $id); 
         $stmt->bindParam(':name', $name); 

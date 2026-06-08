@@ -18,41 +18,33 @@
         <h1 class="tech-title m-0">EDIT</h1>
     </div>
 
-    <?php if (!empty($errors)): ?> 
-        <div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ffcccc;"> 
-            <ul class="mb-0"> 
-                <?php foreach ($errors as $error): ?> 
-                    <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li> 
-                <?php endforeach; ?> 
-            </ul> 
-        </div> 
-    <?php endif; ?> 
+    <div id="errorContainer"></div>
 
     <div class="tech-card">
-        <form method="POST" action="/Product/update" onsubmit="return validateForm();" enctype="multipart/form-data"> 
-            <input type="hidden" name="id" value="<?php echo $product->id; ?>"> 
+        <form id="editProductForm" enctype="multipart/form-data"> 
+            <input type="hidden" id="productId" name="id" value="<?php echo isset($product) ? $product->id : ''; ?>"> 
             
             <div class="form-group mb-4"> 
                 <label for="name" class="tech-label">Tên sản phẩm:</label> 
-                <input type="text" id="name" name="name" class="form-control tech-input" value="<?php echo htmlspecialchars($product->name, ENT_QUOTES, 'UTF-8'); ?>" required> 
+                <input type="text" id="name" name="name" class="form-control tech-input" value="<?php echo isset($product) ? htmlspecialchars($product->name, ENT_QUOTES, 'UTF-8') : ''; ?>" required> 
             </div> 
             
             <div class="form-group mb-4"> 
                 <label for="description" class="tech-label">Mô tả:</label> 
-                <textarea id="description" name="description" class="form-control tech-input" rows="4" required><?php echo htmlspecialchars($product->description, ENT_QUOTES, 'UTF-8'); ?></textarea> 
+                <textarea id="description" name="description" class="form-control tech-input" rows="4" required><?php echo isset($product) ? htmlspecialchars($product->description, ENT_QUOTES, 'UTF-8') : ''; ?></textarea> 
             </div> 
             
             <div class="row">
                 <div class="form-group mb-4 col-md-6"> 
                     <label for="price" class="tech-label">Giá (USD):</label> 
-                    <input type="number" id="price" name="price" class="form-control tech-input" step="0.01" value="<?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?>" required> 
+                    <input type="number" id="price" name="price" class="form-control tech-input" step="0.01" value="<?php echo isset($product) ? htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8') : ''; ?>" required> 
                 </div> 
                 
                 <div class="form-group mb-4 col-md-6"> 
                     <label for="category_id" class="tech-label">Danh mục:</label> 
                     <select id="category_id" name="category_id" class="form-select tech-input" required> 
                         <?php foreach ($categories as $category): ?> 
-                            <option value="<?php echo $category->id; ?>" style="background: #1e1e26; color: #fff;" <?php echo $category->id == $product->category_id ? 'selected' : ''; ?>> 
+                            <option value="<?php echo $category->id; ?>" style="background: #1e1e26; color: #fff;" <?php echo (isset($product) && $category->id == $product->category_id) ? 'selected' : ''; ?>> 
                                 <?php echo htmlspecialchars($category->name, ENT_QUOTES, 'UTF-8'); ?> 
                             </option> 
                         <?php endforeach; ?> 
@@ -63,9 +55,8 @@
             <div class="form-group mb-5"> 
                 <label for="image" class="tech-label">Cập nhật hình ảnh:</label> 
                 <input type="file" id="image" name="image" class="form-control tech-input mb-3" accept="image/*"> 
-                <input type="hidden" name="existing_image" value="<?php echo $product->image; ?>"> 
                 
-                <?php if (!empty($product->image)): ?> 
+                <?php if (isset($product) && !empty($product->image)): ?> 
                     <div class="mt-2 p-3 bg-dark rounded border border-secondary d-inline-block">
                         <span class="text-secondary small d-block mb-2 font-monospace">Hình ảnh hiện tại:</span>
                         <img src="/<?php echo htmlspecialchars($product->image, ENT_QUOTES, 'UTF-8'); ?>" alt="Product Image" class="img-preview"> 
@@ -74,11 +65,68 @@
             </div> 
             
             <div class="d-flex justify-content-between align-items-center">
-                <a href="/product/index" class="btn btn-outline-secondary">Hủy bỏ</a> 
-                <button type="submit" class="btn btn-neon px-5 py-2">GHI ĐÈ DỮ LIỆU</button> 
+                <a href="/product/" class="btn btn-outline-secondary">Hủy bỏ</a> 
+                <button type="submit" class="btn btn-neon px-5 py-2" id="submitBtn">GHI ĐÈ DỮ LIỆU</button> 
             </div>
         </form> 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('editProductForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorContainer = document.getElementById('errorContainer');
+            const productId = document.getElementById('productId').value;
+            
+            form.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang lưu...';
+                errorContainer.innerHTML = '';
+                
+                try {
+                    const data = {
+                        name: document.getElementById('name').value,
+                        description: document.getElementById('description').value,
+                        price: document.getElementById('price').value,
+                        category_id: document.getElementById('category_id').value
+                    };
+                    
+                    const response = await fetch(`/api/product/${productId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        // Success
+                        alert('Sản phẩm đã được cập nhật thành công!');
+                        window.location.href = '/product/';
+                    } else if (result.errors) {
+                        // Show validation errors
+                        const errorHtml = '<div class="alert alert-danger" style="background-color: rgba(220, 53, 69, 0.2); border-color: #dc3545; color: #ffcccc;"><ul class="mb-0">' +
+                            result.errors.map(err => `<li>${err}</li>`).join('') +
+                            '</ul></div>';
+                        errorContainer.innerHTML = errorHtml;
+                    } else {
+                        throw new Error(result.message || 'Lỗi không xác định');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorContainer.innerHTML = `<div class="alert alert-danger">Lỗi: ${error.message}</div>`;
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'GHI ĐÈ DỮ LIỆU';
+                }
+            });
+        });
+    </script>
 </div>
 
 <?php include 'app/views/shares/footer.php'; ?>

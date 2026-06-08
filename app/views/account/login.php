@@ -1,84 +1,80 @@
 <?php include 'app/views/shares/header.php'; ?>
 
-<section class="vh-100 gradient-custom">
-    <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-                <div class="card bg-dark text-white" style="border-radius: 1rem;">
-                    <div class="card-body p-5 text-center">
+<style>
+    .auth-container { min-height: 90vh; display: flex; align-items: center; justify-content: center; }
+    .auth-card { 
+        background: rgba(30, 30, 38, 0.8); 
+        border: 1px solid rgba(255, 42, 117, 0.3); 
+        border-radius: 20px; 
+        padding: 40px; 
+        width: 100%; 
+        max-width: 450px; 
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+    .form-control-tech {
+        background: rgba(18, 18, 22, 0.5);
+        border: 1px solid rgba(255, 42, 117, 0.2);
+        color: #fff;
+        padding: 12px;
+        border-radius: 10px;
+    }
+    .form-control-tech:focus {
+        background: rgba(18, 18, 22, 0.8);
+        border-color: var(--neon-pink);
+        box-shadow: 0 0 10px rgba(255, 42, 117, 0.3);
+        color: #fff;
+    }
+</style>
 
-                        <form action="/account/checklogin" method="post">
-                            <div class="mb-md-5 mt-md-4 pb-5">
-
-                                <h2 class="fw-bold mb-2 text-uppercase">
-                                    Login
-                                </h2>
-
-                                <p class="text-white-50 mb-5">
-                                    Please enter your login and password!
-                                </p>
-
-                                <div class="form-outline form-white mb-4">
-                                    <input
-                                        type="text"
-                                        name="username"
-                                        class="form-control form-control-lg"
-                                    />
-                                    <label class="form-label">
-                                        UserName
-                                    </label>
-                                </div>
-
-                                <div class="form-outline form-white mb-4">
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        class="form-control form-control-lg"
-                                    />
-                                    <label class="form-label">
-                                        Password
-                                    </label>
-                                </div>
-
-                                <p class="small mb-5 pb-lg-2">
-                                    <a class="text-white-50" href="#!">
-                                        Forgot password?
-                                    </a>
-                                </p>
-
-                                <button
-                                    class="btn btn-outline-light btn-lg px-5"
-                                    type="submit"
-                                >
-                                    Login
-                                </button>
-
-                                <div class="d-flex justify-content-center text-center mt-4 pt-1">
-                                    <a href="/account/googleLogin" class="text-white me-4">
-                                        <i class="fab fa-google fa-lg" style="color: #DB4437;"></i>
-                                    </a>
-                                    <a href="/account/githubLogin" class="text-white">
-                                        <i class="fab fa-github fa-lg" style="color: #ffffff;"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <p class="mb-0">
-                                    Don't have an account?
-                                    <a href="/account/register"
-                                       class="text-white-50 fw-bold">
-                                        Sign Up
-                                    </a>
-                                </p>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <h2 class="tech-title">LOGIN</h2>
+            <p class="text-secondary small">VUI LÒNG NHẬP THÔNG TIN TRUY CẬP</p>
         </div>
+
+        <?php if (isset($error)): ?>
+            <div class='alert alert-danger border-0 bg-transparent text-danger p-0 mb-3 small text-center' role='alert'>
+                <i class="fas fa-exclamation-triangle me-1"></i> <?= $error ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="/Account/checkLogin" method="post">
+            <div class="mb-4">
+                <label class="form-label small text-secondary font-monospace">USERNAME</label>
+                <input type="text" name="username" class="form-control form-control-tech" required placeholder="Nhập tài khoản...">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label small text-secondary font-monospace">PASSWORD</label>
+                <input type="password" name="password" class="form-control form-control-tech" required placeholder="********">
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="remember">
+                    <label class="form-check-label small text-secondary" for="remember">Ghi nhớ</label>
+                </div>
+                <a href="#" class="small text-decoration-none" style="color: var(--neon-blue);">Quên mật mã?</a>
+            </div>
+
+            <button type="submit" class="btn btn-neon w-100 py-3 mb-4 rounded-3">
+                XÁC NHẬN ĐĂNG NHẬP
+            </button>
+
+            <div class="text-center">
+                <p class="text-secondary small mb-3">HOẶC ĐĂNG NHẬP VỚI</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/Account/googleLogin" class="btn btn-outline-secondary rounded-circle"><i class="fab fa-google"></i></a>
+                    <a href="/Account/githubLogin" class="btn btn-outline-secondary rounded-circle"><i class="fab fa-github"></i></a>
+                </div>
+                <p class="mt-4 small text-secondary">
+                    Chưa có tài khoản? <a href="/account/register" class="text-white fw-bold text-decoration-none">ĐĂNG KÝ NGAY</a>
+                </p>
+            </div>
+        </form>
     </div>
-</section>
+</div>
 
 <?php include 'app/views/shares/footer.php'; ?>
